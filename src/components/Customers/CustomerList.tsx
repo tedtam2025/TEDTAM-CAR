@@ -10,7 +10,6 @@ import { FilterModal } from './FilterModal';
 import { ProgressiveCustomerForm } from './ProgressiveCustomerForm';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useAuth } from '@/hooks/useAuth';
-import { exportCustomersToExcel, downloadExcelTemplate, importCustomersFromExcel, convertExcelToCustomer } from '@/utils/excelUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -69,74 +68,6 @@ export const CustomerList: React.FC = () => {
       </div>
     );
   }
-
-  const handleExportExcel = () => {
-    exportCustomersToExcel(filteredCustomers, `customers-${new Date().toISOString().split('T')[0]}.xlsx`);
-    toast.success('ส่งออกข้อมูลสำเร็จ!');
-  };
-
-  const handleDownloadTemplate = () => {
-    downloadExcelTemplate();
-    toast.success('ดาวน์โหลดแม่แบบสำเร็จ!');
-  };
-
-  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
-
-    try {
-      const excelData = await importCustomersFromExcel(file);
-      const customersToInsert = excelData.map(data => ({
-        uid: `F3574เอสดี${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        ...convertExcelToCustomer(data),
-        created_by: user.id
-      }));
-
-      const { error } = await supabase
-        .from('customers')
-        .insert(customersToInsert.map(customer => ({
-          uid: customer.uid,
-          registration_id: customer.registrationId,
-          field_team: customer.fieldTeam,
-          work_group: customer.workGroup,
-          group_code: customer.groupCode,
-          branch: customer.branch,
-          account_number: customer.accountNumber,
-          name: customer.name,
-          principle: customer.principle,
-          installment: customer.installment,
-          current_bucket: customer.currentBucket,
-          cycle_day: customer.cycleDay,
-          blue_book_price: customer.blueBookPrice,
-          commission: customer.commission,
-          brand: customer.brand,
-          model: customer.model,
-          license_plate: customer.licensePlate,
-          engine_number: customer.engineNumber,
-          address: customer.address,
-          latitude: customer.latitude,
-          longitude: customer.longitude,
-          work_status: customer.workStatus,
-          resus: customer.resus,
-          last_visit_result: customer.lastVisitResult,
-          authorization_date: customer.authorizationDate,
-          phone_numbers: customer.phoneNumbers,
-          notes: customer.notes,
-          created_by: customer.created_by
-        })));
-
-      if (error) throw error;
-
-      toast.success(`นำเข้าข้อมูล ${customersToInsert.length} รายสำเร็จ!`);
-      refetch();
-    } catch (error) {
-      console.error('Import error:', error);
-      toast.error('เกิดข้อผิดพลาดในการนำเข้าข้อมูล');
-    }
-
-    // Reset file input
-    event.target.value = '';
-  };
 
   return (
     <div className="p-4 space-y-6">
@@ -256,6 +187,9 @@ export const CustomerList: React.FC = () => {
             <FileSpreadsheet className="w-4 h-4" />
             <span className="text-xs">แม่แบบ</span>
           </Button>
+          
+          // Remove these imports
+          import { Search, Filter, Plus, Users, Zap } from 'lucide-react';
           
           <Button
             variant="outline"
