@@ -1,14 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-if (!import.meta.env.VITE_SUPABASE_URL) {
-  throw new Error('VITE_SUPABASE_URL is required');
-}
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  throw new Error('VITE_SUPABASE_ANON_KEY is required');
-}
+if (!SUPABASE_URL) throw new Error('VITE_SUPABASE_URL is required');
+if (!SUPABASE_ANON_KEY) throw new Error('VITE_SUPABASE_ANON_KEY is required');
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
